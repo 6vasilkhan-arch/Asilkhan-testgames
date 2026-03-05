@@ -1,0 +1,1253 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Telecom Games Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700;800;900&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #08090e;
+  --surface: #0f1119;
+  --surface2: #161825;
+  --surface3: #1e2035;
+  --border: rgba(255,255,255,0.06);
+  --cyan: #00e5ff;
+  --purple: #a855f7;
+  --green: #34d399;
+  --amber: #fbbf24;
+  --rose: #fb7185;
+  --blue: #60a5fa;
+  --text: #e4e6ed;
+  --text-dim: #5a5f7a;
+  --text-mid: #8b90a8;
+  --radius: 14px;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Outfit', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+body::before {
+  content:'';
+  position:fixed;
+  inset:0;
+  background:
+    radial-gradient(ellipse at 15% 10%, rgba(0,229,255,0.04) 0%, transparent 50%),
+    radial-gradient(ellipse at 85% 90%, rgba(168,85,247,0.04) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(52,211,153,0.02) 0%, transparent 60%);
+  pointer-events:none;
+  z-index:0;
+}
+
+.app { position:relative; z-index:1; }
+
+/* ===== NAVIGATION ===== */
+.top-bar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(8,9,14,0.85);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+}
+
+.top-bar-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+}
+
+.logo {
+  font-family: 'Instrument Serif', serif;
+  font-size: 22px;
+  font-style: italic;
+  background: linear-gradient(135deg, var(--cyan), var(--purple));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.nav-tabs {
+  display: flex;
+  gap: 4px;
+}
+
+.nav-tab {
+  padding: 8px 18px;
+  border: none;
+  background: none;
+  color: var(--text-dim);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.nav-tab:hover { color: var(--text); background: var(--surface2); }
+.nav-tab.active { color: var(--cyan); background: rgba(0,229,255,0.08); }
+.nav-tab .tab-score {
+  font-size: 9px;
+  background: var(--surface3);
+  padding: 2px 6px;
+  border-radius: 6px;
+  margin-left: 6px;
+  color: var(--amber);
+}
+
+.total-score-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--amber);
+}
+
+.total-score-bar .score-icon { font-size: 16px; }
+
+/* ===== PAGES ===== */
+.page { display: none; padding: 24px 20px 60px; max-width: 1200px; margin: 0 auto; }
+.page.active { display: block; animation: pageIn 0.3s ease; }
+@keyframes pageIn { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+
+.page-header {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.page-header h2 {
+  font-family: 'Outfit', sans-serif;
+  font-size: clamp(26px, 4vw, 38px);
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  margin-bottom: 6px;
+}
+
+.page-header .desc {
+  font-size: 14px;
+  color: var(--text-dim);
+  font-weight: 300;
+}
+
+/* ===== HOME ===== */
+.home-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  margin-top: 40px;
+}
+
+.game-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 32px 28px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.game-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  border-radius: 20px 20px 0 0;
+}
+
+.game-card:nth-child(1)::before { background: linear-gradient(90deg, var(--cyan), var(--blue)); }
+.game-card:nth-child(2)::before { background: linear-gradient(90deg, var(--purple), var(--rose)); }
+.game-card:nth-child(3)::before { background: linear-gradient(90deg, var(--green), var(--amber)); }
+
+.game-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(255,255,255,0.12);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+}
+
+.card-emoji { font-size: 40px; margin-bottom: 16px; }
+.card-title { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+.card-desc { font-size: 13px; color: var(--text-dim); line-height: 1.6; }
+.card-score-row {
+  margin-top: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.card-best {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--text-dim);
+}
+.card-play {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--cyan);
+}
+
+/* ===== SHARED COMPONENTS ===== */
+.btn-action {
+  padding: 10px 24px;
+  border: 1px solid rgba(0,229,255,0.3);
+  border-radius: 10px;
+  background: rgba(0,229,255,0.06);
+  color: var(--cyan);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-action:hover { background: rgba(0,229,255,0.12); box-shadow: 0 0 16px rgba(0,229,255,0.2); }
+
+.stat-row {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.stat-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 18px;
+  text-align: center;
+  min-width: 100px;
+}
+.stat-box .val {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 22px;
+  font-weight: 700;
+}
+.stat-box .lbl {
+  font-size: 10px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-top: 2px;
+}
+
+.val-cyan { color: var(--cyan); }
+.val-purple { color: var(--purple); }
+.val-green { color: var(--green); }
+.val-amber { color: var(--amber); }
+.val-rose { color: var(--rose); }
+
+/* ===== WORD SEARCH ===== */
+.ws-layout {
+  display: grid;
+  grid-template-columns: 1fr 260px;
+  gap: 20px;
+  align-items: start;
+}
+
+@media (max-width: 860px) {
+  .ws-layout { grid-template-columns: 1fr; }
+}
+
+.ws-grid-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+}
+
+.ws-grid {
+  display: grid;
+  gap: 2px;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+}
+
+.ws-cell {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: clamp(10px, 1.6vw, 16px);
+  font-weight: 600;
+  background: var(--surface2);
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.12s;
+  text-transform: uppercase;
+}
+
+.ws-cell:hover { background: rgba(168,85,247,0.12); transform: scale(1.06); }
+.ws-cell.selecting { background: rgba(168,85,247,0.35); color: #fff; transform: scale(1.1); }
+.ws-cell.ws-found-0 { background: rgba(0,229,255,0.15); color: var(--cyan); }
+.ws-cell.ws-found-1 { background: rgba(168,85,247,0.15); color: var(--purple); }
+.ws-cell.ws-found-2 { background: rgba(52,211,153,0.15); color: var(--green); }
+
+.ws-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+}
+
+.ws-panel-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--cyan);
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.ws-word {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  padding: 7px 10px;
+  margin-bottom: 3px;
+  border-radius: 7px;
+  background: var(--surface2);
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ws-word .dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--text-dim);
+  flex-shrink: 0;
+  transition: all 0.3s;
+}
+
+.ws-word.found-w {
+  background: rgba(0,229,255,0.06);
+  text-decoration: line-through;
+  color: var(--text-dim);
+}
+.ws-word.found-w .dot { background: var(--cyan); box-shadow: 0 0 6px rgba(0,229,255,0.5); }
+
+.ws-hint {
+  text-align: center;
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-top: 10px;
+  font-style: italic;
+}
+
+/* ===== QUIZ ===== */
+.quiz-container { max-width: 720px; margin: 0 auto; }
+
+.quiz-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px;
+  margin-bottom: 20px;
+}
+
+.quiz-section-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--purple);
+  margin-bottom: 12px;
+}
+
+.quiz-progress-bar {
+  width: 100%;
+  height: 4px;
+  background: var(--surface2);
+  border-radius: 2px;
+  margin-bottom: 24px;
+  overflow: hidden;
+}
+
+.quiz-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--purple), var(--cyan));
+  border-radius: 2px;
+  transition: width 0.4s ease;
+}
+
+.quiz-q-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-bottom: 8px;
+}
+
+.quiz-q-text {
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+.quiz-options { display: flex; flex-direction: column; gap: 8px; }
+
+.quiz-opt {
+  padding: 14px 18px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface2);
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 14px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.quiz-opt:hover:not(.q-disabled) { border-color: rgba(168,85,247,0.4); background: rgba(168,85,247,0.08); }
+
+.quiz-opt .opt-letter {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  font-weight: 700;
+  min-width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  background: var(--surface3);
+  flex-shrink: 0;
+}
+
+.quiz-opt.q-correct {
+  border-color: rgba(52,211,153,0.5);
+  background: rgba(52,211,153,0.1);
+}
+.quiz-opt.q-correct .opt-letter { background: var(--green); color: var(--bg); }
+
+.quiz-opt.q-wrong {
+  border-color: rgba(251,113,133,0.5);
+  background: rgba(251,113,133,0.08);
+}
+.quiz-opt.q-wrong .opt-letter { background: var(--rose); color: var(--bg); }
+
+.quiz-opt.q-disabled { cursor: default; opacity: 0.7; }
+
+.quiz-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.quiz-result {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.quiz-result-score {
+  font-size: 64px;
+  font-weight: 900;
+  margin-bottom: 8px;
+}
+
+.quiz-result-label {
+  font-size: 16px;
+  color: var(--text-dim);
+  margin-bottom: 24px;
+}
+
+/* ===== CONNECTIONS ===== */
+.conn-container { max-width: 600px; margin: 0 auto; }
+
+.conn-board {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.conn-tile {
+  aspect-ratio: 2/1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: clamp(10px, 2.2vw, 13px);
+  font-weight: 600;
+  text-align: center;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  padding: 8px 4px;
+  text-transform: uppercase;
+  user-select: none;
+  line-height: 1.2;
+}
+
+.conn-tile:hover:not(.conn-solved):not(.conn-selected) {
+  border-color: rgba(255,255,255,0.15);
+  background: var(--surface3);
+}
+
+.conn-tile.conn-selected {
+  border-color: var(--cyan);
+  background: rgba(0,229,255,0.12);
+  color: var(--cyan);
+  transform: scale(0.96);
+}
+
+.conn-tile.conn-solved {
+  cursor: default;
+  color: var(--bg);
+  font-weight: 700;
+  border: none;
+}
+
+.conn-cat-0 { background: var(--green) !important; }
+.conn-cat-1 { background: var(--amber) !important; }
+.conn-cat-2 { background: var(--blue) !important; }
+.conn-cat-3 { background: var(--purple) !important; }
+
+.conn-solved-label {
+  border-radius: 10px;
+  padding: 14px;
+  margin-bottom: 8px;
+  text-align: center;
+  color: var(--bg);
+  font-weight: 700;
+  animation: solvedIn 0.4s ease;
+}
+
+@keyframes solvedIn { from { opacity:0; transform:scale(0.9); } to { opacity:1; transform:scale(1); } }
+
+.conn-solved-label .cat-name {
+  font-family: 'Outfit', sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.conn-solved-label .cat-items {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  margin-top: 4px;
+  opacity: 0.85;
+}
+
+.conn-controls {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.conn-btn {
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--text);
+}
+.conn-btn:hover { background: var(--surface3); }
+.conn-btn.primary { border-color: rgba(0,229,255,0.3); color: var(--cyan); background: rgba(0,229,255,0.06); }
+.conn-btn.primary:hover { background: rgba(0,229,255,0.12); }
+.conn-btn:disabled { opacity: 0.3; cursor: default; }
+
+.mistakes-dots {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  margin-bottom: 16px;
+  align-items: center;
+}
+
+.mistakes-label {
+  font-size: 12px;
+  color: var(--text-dim);
+  margin-right: 6px;
+}
+
+.mistake-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--text-dim);
+  transition: all 0.3s;
+}
+
+.mistake-dot.used { background: var(--rose); box-shadow: 0 0 8px rgba(251,113,133,0.4); }
+
+.conn-shake {
+  animation: shake 0.4s ease;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  75% { transform: translateX(6px); }
+}
+
+/* ===== OVERLAY ===== */
+.overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(8,9,14,0.9);
+  z-index: 100;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(8px);
+}
+.overlay.show { display: flex; }
+
+.overlay-box {
+  text-align: center;
+  padding: 48px;
+  animation: slideUp 0.4s ease;
+}
+
+@keyframes slideUp { from { transform:translateY(20px); opacity:0; } to { transform:translateY(0); opacity:1; } }
+
+.overlay-emoji { font-size: 56px; margin-bottom: 12px; }
+.overlay-title {
+  font-size: 32px; font-weight: 800;
+  background: linear-gradient(135deg, var(--cyan), var(--purple));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 8px;
+}
+.overlay-sub { color: var(--text-dim); font-size: 15px; margin-bottom: 24px; }
+
+@media (max-width: 600px) {
+  .nav-tabs { gap: 2px; }
+  .nav-tab { padding: 6px 10px; font-size: 10px; }
+  .total-score-bar { font-size: 11px; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- NAV -->
+<div class="top-bar">
+  <div class="top-bar-inner">
+    <div class="logo">Telecom Games</div>
+    <div class="nav-tabs">
+      <button class="nav-tab active" onclick="showPage('home')">Басты</button>
+      <button class="nav-tab" onclick="showPage('wordsearch')">Сөз іздеу</button>
+      <button class="nav-tab" onclick="showPage('quiz')">Тест</button>
+      <button class="nav-tab" onclick="showPage('connections')">Байланыс</button>
+    </div>
+    <div class="total-score-bar">
+      <span class="score-icon">⭐</span>
+      <span id="totalScore">0</span> ұпай
+    </div>
+  </div>
+</div>
+
+<!-- HOME -->
+<div class="page active" id="page-home">
+  <div class="page-header" style="margin-top:40px;">
+    <h2 style="font-family:'Instrument Serif',serif; font-style:italic; font-weight:400; font-size:clamp(32px,5vw,52px);">
+      Wireless Tech
+    </h2>
+    <div class="desc">Телекоммуникация бойынша білімді ойын арқылы тексер</div>
+    <div style="font-size:12px; color:var(--text-dim); margin-top:4px;">Created By Asilkhan</div>
+  </div>
+  <div class="home-grid">
+    <div class="game-card" onclick="showPage('wordsearch')">
+      <div class="card-emoji">🔎</div>
+      <div class="card-title">Сөз іздеу</div>
+      <div class="card-desc">Торда жасырылған 15 телекоммуникация терминін 7 минутта тауып белгілеңіз. Әр сөз = 10 ұпай.</div>
+      <div class="card-score-row">
+        <span class="card-best" id="ws-best">Ең жақсы: —</span>
+        <span class="card-play">Ойнау →</span>
+      </div>
+    </div>
+    <div class="game-card" onclick="showPage('quiz')">
+      <div class="card-emoji">📝</div>
+      <div class="card-title">Тест сұрақтары</div>
+      <div class="card-desc">35 сұрақ: сымсыз байланыс, 4G/LTE, IoT, кванттық технологиялар. Әр дұрыс жауап = 10 ұпай.</div>
+      <div class="card-score-row">
+        <span class="card-best" id="qz-best">Ең жақсы: —</span>
+        <span class="card-play">Бастау →</span>
+      </div>
+    </div>
+    <div class="game-card" onclick="showPage('connections')">
+      <div class="card-emoji">🧩</div>
+      <div class="card-title">Байланыс тап</div>
+      <div class="card-desc">16 сөзді 4 санатқа дұрыс бөліңіз. Тек 4 қате жасауға болады! 1 санат = 50, 2 = 100, 3 = 200, 4 = 350 ұпай. Бір рет ойнауға болады!</div>
+      <div class="card-score-row">
+        <span class="card-best" id="cn-best">Ең жақсы: —</span>
+        <span class="card-play">Ойнау →</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- WORD SEARCH -->
+<div class="page" id="page-wordsearch">
+  <div class="page-header">
+    <h2>🔎 Сөз іздеу</h2>
+    <div class="desc">Бірінші әріпке басып, соңғы әріпке дейін сүйреңіз</div>
+  </div>
+  <div class="stat-row">
+    <div class="stat-box"><div class="val val-cyan" id="wsFound">0</div><div class="lbl">Табылған</div></div>
+    <div class="stat-box"><div class="val val-purple" id="wsTimer">07:00</div><div class="lbl">Қалған уақыт</div></div>
+    <div class="stat-box"><div class="val val-amber" id="wsPoints">0</div><div class="lbl">Ұпай</div></div>
+    <div class="stat-box"><div class="val val-green" id="wsTotal">0</div><div class="lbl">Барлығы</div></div>
+  </div>
+  <div class="ws-layout">
+    <div class="ws-grid-wrap">
+      <div class="ws-grid" id="wsGrid"></div>
+      <div class="ws-hint">Әріпке басып, сүйреңіз</div>
+    </div>
+    <div class="ws-panel">
+      <div class="ws-panel-title">// сөздер тізімі</div>
+      <div id="wsWordList"></div>
+      <button class="btn-action" style="width:100%;margin-top:14px;" onclick="wsReset()">Қайта бастау</button>
+    </div>
+  </div>
+</div>
+
+<!-- QUIZ -->
+<div class="page" id="page-quiz">
+  <div class="page-header">
+    <h2>📝 Тест сұрақтары</h2>
+    <div class="desc">35 сұрақ — дұрыс жауапты таңдаңыз</div>
+  </div>
+  <div class="stat-row">
+    <div class="stat-box"><div class="val val-green" id="qzCorrect">0</div><div class="lbl">Дұрыс</div></div>
+    <div class="stat-box"><div class="val val-rose" id="qzWrong">0</div><div class="lbl">Қате</div></div>
+    <div class="stat-box"><div class="val val-purple" id="qzProgress">1/35</div><div class="lbl">Сұрақ</div></div>
+  </div>
+  <div class="quiz-container" id="quizContainer"></div>
+</div>
+
+<!-- CONNECTIONS -->
+<div class="page" id="page-connections">
+  <div class="page-header">
+    <h2>🧩 Байланыс тап</h2>
+    <div class="desc">Бір санатқа жататын 4 сөзді таңдаңыз</div>
+  </div>
+  <div class="conn-container">
+    <div id="connSolved"></div>
+    <div class="conn-board" id="connBoard"></div>
+    <div class="mistakes-dots" id="mistakesDots">
+      <span class="mistakes-label">Қалған қате:</span>
+      <span class="mistake-dot" id="md0"></span>
+      <span class="mistake-dot" id="md1"></span>
+      <span class="mistake-dot" id="md2"></span>
+      <span class="mistake-dot" id="md3"></span>
+    </div>
+    <div class="conn-controls">
+      <button class="conn-btn" onclick="connShuffle()">Араластыру</button>
+      <button class="conn-btn" onclick="connDeselect()">Тазалау</button>
+      <button class="conn-btn primary" id="connSubmitBtn" onclick="connSubmit()" disabled>Тексеру</button>
+    </div>
+    <div id="connLockMsg" style="display:none;text-align:center;margin-top:16px;font-size:13px;color:var(--text-dim);font-style:italic;">Ойын аяқталды. Байланыс ойынын тек бір рет ойнауға болады.</div>
+  </div>
+</div>
+
+</div>
+
+<!-- OVERLAY -->
+<div class="overlay" id="overlay">
+  <div class="overlay-box">
+    <div class="overlay-emoji" id="ovEmoji">🎉</div>
+    <div class="overlay-title" id="ovTitle">Тамаша!</div>
+    <div class="overlay-sub" id="ovSub">Ойын аяқталды</div>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+      <button class="btn-action" id="ovBtn1" onclick="">OK</button>
+      <button class="btn-action" id="ovBtn2" onclick="" style="display:none">Қайта</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// GLOBAL SCORES
+// ============================================================
+const scores = { wordsearch: 0, quiz: 0, connections: 0 };
+
+function updateTotalScore() {
+  document.getElementById('totalScore').textContent = scores.wordsearch + scores.quiz + scores.connections;
+}
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  document.querySelectorAll('.nav-tab').forEach((t, i) => {
+    const pages = ['home','wordsearch','quiz','connections'];
+    t.classList.toggle('active', pages[i] === id);
+  });
+}
+
+// ============================================================
+// OVERLAY
+// ============================================================
+function showOverlay(emoji, title, sub, btn1Text, btn1Fn, btn2Text, btn2Fn) {
+  document.getElementById('ovEmoji').textContent = emoji;
+  document.getElementById('ovTitle').textContent = title;
+  document.getElementById('ovSub').textContent = sub;
+  const b1 = document.getElementById('ovBtn1');
+  const b2 = document.getElementById('ovBtn2');
+  b1.textContent = btn1Text;
+  b1.onclick = () => { document.getElementById('overlay').classList.remove('show'); if(btn1Fn) btn1Fn(); };
+  if (btn2Text) {
+    b2.style.display = 'inline-block';
+    b2.textContent = btn2Text;
+    b2.onclick = () => { document.getElementById('overlay').classList.remove('show'); if(btn2Fn) btn2Fn(); };
+  } else {
+    b2.style.display = 'none';
+  }
+  document.getElementById('overlay').classList.add('show');
+}
+
+// ============================================================
+// WORD SEARCH — Fixed grid, 7 min time limit, 10 pts per word
+// ============================================================
+const WS_SIZE = 15;
+const WS_TIME_LIMIT = 7 * 60; // 7 minutes
+const WS_PTS_PER_WORD = 10;
+
+// Pre-built fixed grid with words at known positions (verified)
+const WS_FIXED_GRID = [
+  "БЗБКВАНТТЫҚСПОЖ",
+  "АШИФРЛАУИЖҰЕІЮЕ",
+  "ЙВБЕНОҢБСПЕКТРЛ",
+  "ЛҮМҰЭФОТОНОЯІСІ",
+  "ААКНАРЫҚЮХСЙНХЖ",
+  "НЕШЖЦЦРДЕРЕКТЕР",
+  "ЫВӘОРБИТАҰЗШЕҮТ",
+  "СИГНАЛЧҺМДВОТЕО",
+  "ЖШСӘЧКЧЦНСДКАҰП",
+  "КӘШССПУТНИКҮРОФ",
+  "ГОТРАФИКВФЩСНДН",
+  "ҺФНҚЩӘЙРИПҮКАҰР",
+  "ІЮГИБРИДТІІІЩЧО",
+  "ИҢҚЕГЗЙКЮДШЛШӘӨ",
+  "РҮАЗҰСХЗТЮКТӘАР",
+];
+
+const WS_PLACED = [
+  {word:"БАЙЛАНЫС", desc:"Телекоммуникация", cells:[[0,0],[1,0],[2,0],[3,0],[4,0],[5,0],[6,0],[7,0]]},
+  {word:"КВАНТТЫҚ", desc:"Кванттық байланыс", cells:[[0,3],[0,4],[0,5],[0,6],[0,7],[0,8],[0,9],[0,10]]},
+  {word:"ШИФРЛАУ",  desc:"Деректерді қорғау", cells:[[1,1],[1,2],[1,3],[1,4],[1,5],[1,6],[1,7]]},
+  {word:"СПЕКТР",   desc:"Жиіліктер",         cells:[[2,8],[2,9],[2,10],[2,11],[2,12],[2,13]]},
+  {word:"ФОТОН",    desc:"Жарық бөлшегі",     cells:[[3,5],[3,6],[3,7],[3,8],[3,9]]},
+  {word:"НАРЫҚ",    desc:"Market",             cells:[[4,3],[4,4],[4,5],[4,6],[4,7]]},
+  {word:"ДЕРЕКТЕР", desc:"Data",               cells:[[5,7],[5,8],[5,9],[5,10],[5,11],[5,12],[5,13],[5,14]]},
+  {word:"ОРБИТА",   desc:"Спутник жолы",       cells:[[6,3],[6,4],[6,5],[6,6],[6,7],[6,8]]},
+  {word:"СИГНАЛ",   desc:"Байланыс сигналы",   cells:[[7,0],[7,1],[7,2],[7,3],[7,4],[7,5]]},
+  {word:"СПУТНИК",  desc:"Ғарыштық байланыс",  cells:[[9,4],[9,5],[9,6],[9,7],[9,8],[9,9],[9,10]]},
+  {word:"ТРАФИК",   desc:"Деректер ағыны",     cells:[[10,2],[10,3],[10,4],[10,5],[10,6],[10,7]]},
+  {word:"ГИБРИДТІ", desc:"Аралас жүйе",       cells:[[12,2],[12,3],[12,4],[12,5],[12,6],[12,7],[12,8],[12,9]]},
+  {word:"ЖЕЛІ",     desc:"Network",            cells:[[0,14],[1,14],[2,14],[3,14]]},
+  {word:"АРНА",     desc:"Байланыс арнасы",    cells:[[8,12],[9,12],[10,12],[11,12]]},
+  {word:"КІЛТ",     desc:"Шифрлау кілті",      cells:[[11,11],[12,11],[13,11],[14,11]]},
+];
+
+let wsGrid=[], wsPlaced=[], wsFoundSet=new Set(), wsSelecting=false, wsStart=null, wsCurCells=[];
+let wsTimerInt=null, wsSec=0, wsStarted=false, wsFinished=false;
+
+function wsBuild() {
+  wsGrid = WS_FIXED_GRID.map(row => [...row]);
+  wsPlaced = WS_PLACED.map(w => ({...w}));
+}
+
+function wsRender() {
+  const g=document.getElementById('wsGrid');
+  g.style.gridTemplateColumns=`repeat(${WS_SIZE},1fr)`;
+  g.innerHTML='';
+  for(let r=0;r<WS_SIZE;r++)for(let c=0;c<WS_SIZE;c++){
+    const d=document.createElement('div');d.className='ws-cell';d.textContent=wsGrid[r][c];d.dataset.row=r;d.dataset.col=c;
+    d.addEventListener('pointerdown',e=>{e.preventDefault();wsStartSel(r,c);});
+    d.addEventListener('pointerenter',()=>{if(wsSelecting)wsUpdateSel(r,c);});
+    d.addEventListener('pointerup',()=>wsEndSel());
+    g.appendChild(d);
+  }
+  document.addEventListener('pointerup',()=>{if(wsSelecting)wsEndSel();});
+}
+
+function wsRenderList() {
+  const l=document.getElementById('wsWordList');l.innerHTML='';
+  document.getElementById('wsTotal').textContent=wsPlaced.length;
+  for(const item of wsPlaced){
+    const d=document.createElement('div');d.className='ws-word';d.id='ws-'+item.word;
+    d.innerHTML=`<span class="dot"></span><span>${item.word}</span>`;l.appendChild(d);
+  }
+}
+
+function wsGetCell(r,c){return document.querySelector(`.ws-cell[data-row="${r}"][data-col="${c}"]`);}
+
+function wsStartSel(r,c){if(wsFinished)return;if(!wsStarted){wsStarted=true;wsStartTimer();}wsSelecting=true;wsStart={r,c};wsCurCells=[{r,c}];wsHighlight(wsCurCells,'selecting');}
+
+function wsUpdateSel(r,c){
+  if(!wsStart)return;const dr=Math.sign(r-wsStart.r),dc=Math.sign(c-wsStart.c);
+  if(dr!==0&&dc!==0&&Math.abs(r-wsStart.r)!==Math.abs(c-wsStart.c))return;if(dr===0&&dc===0)return;
+  const len=Math.max(Math.abs(r-wsStart.r),Math.abs(c-wsStart.c))+1;const cells=[];
+  for(let i=0;i<len;i++)cells.push({r:wsStart.r+dr*i,c:wsStart.c+dc*i});
+  wsClearHL('selecting');wsCurCells=cells;wsHighlight(cells,'selecting');
+}
+
+function wsEndSel(){
+  if(!wsSelecting||wsFinished)return;wsSelecting=false;
+  const sel=wsCurCells.map(({r,c})=>wsGrid[r][c]).join('');
+  let found=false;
+  for(const item of wsPlaced){
+    if(wsFoundSet.has(item.word))continue;
+    const w=item.cells.map(([r,c])=>wsGrid[r][c]).join('');
+    if(sel===w||sel===w.split('').reverse().join('')){
+      wsFoundSet.add(item.word);found=true;
+      const cls='ws-found-'+wsFoundSet.size%3;
+      item.cells.forEach(([r,c])=>{const el=wsGetCell(r,c);if(el){el.classList.remove('selecting');el.classList.add(cls);}});
+      const we=document.getElementById('ws-'+item.word);if(we)we.classList.add('found-w');
+      const pts = wsFoundSet.size * WS_PTS_PER_WORD;
+      scores.wordsearch = pts; updateTotalScore();
+      document.getElementById('wsFound').textContent=wsFoundSet.size;
+      document.getElementById('wsPoints').textContent=pts;
+      if(wsFoundSet.size===wsPlaced.length){
+        wsFinish('🔎','Барлығы табылды!');
+      }
+      break;
+    }
+  }
+  if(!found)wsClearHL('selecting');
+  wsCurCells=[];wsStart=null;
+}
+
+function wsFinish(emoji, title){
+  wsFinished=true; clearInterval(wsTimerInt);
+  const pts = wsFoundSet.size * WS_PTS_PER_WORD;
+  scores.wordsearch=pts;updateTotalScore();
+  document.getElementById('ws-best').textContent='Ең жақсы: '+pts;
+  const remaining = WS_TIME_LIMIT - wsSec;
+  const m=Math.floor(wsSec/60),s=wsSec%60;
+  setTimeout(()=>showOverlay(emoji,title,`${wsFoundSet.size}/${wsPlaced.length} сөз — ${m} мин ${s} сек — ${pts} ұпай`,'Тамаша',null,'Қайта',wsReset),400);
+}
+
+function wsHighlight(cells,cls){cells.forEach(({r,c})=>{const el=wsGetCell(r,c);if(el&&!el.className.includes('ws-found'))el.classList.add(cls);});}
+function wsClearHL(cls){document.querySelectorAll('.ws-cell.'+cls).forEach(e=>{if(!e.className.includes('ws-found'))e.classList.remove(cls);});}
+
+function wsStartTimer(){
+  wsSec=0;clearInterval(wsTimerInt);
+  wsTimerInt=setInterval(()=>{
+    wsSec++;
+    const remaining = WS_TIME_LIMIT - wsSec;
+    if(remaining <= 0){
+      wsFinish('⏰','Уақыт бітті!');
+      return;
+    }
+    const m=String(Math.floor(remaining/60)).padStart(2,'0');
+    const s=String(remaining%60).padStart(2,'0');
+    document.getElementById('wsTimer').textContent=m+':'+s;
+    // Red warning in last minute
+    if(remaining<=60) document.getElementById('wsTimer').style.color='var(--rose)';
+  },1000);
+  // Show initial time
+  document.getElementById('wsTimer').textContent='07:00';
+}
+
+function wsReset(){clearInterval(wsTimerInt);wsSec=0;wsStarted=false;wsFinished=false;wsFoundSet=new Set();document.getElementById('wsTimer').textContent='07:00';document.getElementById('wsTimer').style.color='';document.getElementById('wsFound').textContent='0';document.getElementById('wsPoints').textContent='0';wsBuild();wsRender();wsRenderList();}
+
+// ============================================================
+// QUIZ
+// ============================================================
+const QUIZ_DATA = [
+  {s:"I. Сымсыз байланыс",q:"Электромагниттік толқынның таралу жылдамдығы вакуумда қандай?",opts:["3 × 10⁶ м/с","3 × 10⁸ м/с","3 × 10¹⁰ м/с","3 × 10⁴ м/с"],ans:1},
+  {s:"I. Сымсыз байланыс",q:"Shannon-Хартли теоремасы бойынша арнаның өткізу қабілеті (C) неге тәуелді?",opts:["Тек жиілік жолағының еніне (B)","Тек сигнал-шу қатынасына (S/N)","Жиілік жолағының еніне (B) және сигнал-шу қатынасына (S/N)","Тек тасымалдаушы жиілікке"],ans:2},
+  {s:"I. Сымсыз байланыс",q:"Модуляцияның қандай түрі сигналдың амплитудасын өзгерту арқылы ақпарат жібереді?",opts:["Жиілік модуляциясы (FM)","Фазалық модуляция (PM)","Амплитудалық модуляция (AM)","Импульсті-кодтық модуляция (PCM)"],ans:2},
+  {s:"I. Сымсыз байланыс",q:"OFDM технологиясының негізгі артықшылығы қандай?",opts:["Бір тасымалдаушы жиілікте жоғары жылдамдық","Көп жолдық таралуға (multipath) төзімділік","Қуатты аз тұтыну","Жабдықтың арзандығы"],ans:1},
+  {s:"I. Сымсыз байланыс",q:"Сымсыз байланыста жиіліктің артуы сигналдың таралуына қалай әсер етеді?",opts:["Сигнал ұзағырақ қашықтыққа тарайды","Сигнал кедергілерді жақсырақ айналып өтеді","Сигналдың әлсіреуі (attenuation) артады","Ешқандай әсер етпейді"],ans:2},
+  {s:"I. Сымсыз байланыс",q:"FDD (Frequency Division Duplex) тәсілінде қандай принцип қолданылады?",opts:["Жіберу мен қабылдау бір жиілікте кезектесе жүреді","Жіберу мен қабылдау әр түрлі жиіліктерде бір мезгілде жүреді","Деректер тек бір бағытта жіберіледі","Деректер пакеттерге бөлінбей жіберіледі"],ans:1},
+  {s:"I. Сымсыз байланыс",q:"Децибел шкаласында сигнал қуатының 2 есе артуы шамамен неше дБ-ге тең?",opts:["1 дБ","3 дБ","6 дБ","10 дБ"],ans:1},
+  {s:"I. Сымсыз байланыс",q:"MIMO технологиясы нені пайдаланады?",opts:["Бірнеше жиілік диапазонын","Бірнеше антеннаны жіберу және қабылдау жағында","Бірнеше спутникті","Бірнеше модуляция түрін бір мезгілде"],ans:1},
+  {s:"II. 4G/LTE",q:"4G LTE желісінің теориялық максималды downlink жылдамдығы қандай?",opts:["10 Мбит/с","50 Мбит/с","100 Мбит/с","1 Гбит/с"],ans:2},
+  {s:"II. 4G/LTE",q:"LTE желісінде қолданылатын көп қатынасу технологиясы қандай?",opts:["CDMA","TDMA","OFDMA (downlink) және SC-FDMA (uplink)","FDMA"],ans:2},
+  {s:"II. 4G/LTE",q:"4G LTE архитектурасындағы eNodeB деген не?",opts:["Желі ядросының серверлері","Базалық станция (Base Station)","Абоненттік құрылғы","SIM картаны басқару жүйесі"],ans:1},
+  {s:"II. 4G/LTE",q:"LTE желісіндегі EPC қандай функцияны орындайды?",opts:["Радио сигналдарды модуляциялау","Желі ядросы ретінде деректерді маршруттау, аутентификация және сессияларды басқару","Базалық станцияларды физикалық түрде қосу","Антенналарды калибрлеу"],ans:1},
+  {s:"II. 4G/LTE",q:"LTE-Advanced технологиясында Carrier Aggregation нені білдіреді?",opts:["Бірнеше базалық станцияны біріктіру","Бірнеше жиілік жолағын біріктіріп жылдамдықты арттыру","Бірнеше SIM картаны қолдау","Бірнеше операторды бір желіге біріктіру"],ans:1},
+  {s:"II. 4G/LTE",q:"4G LTE желісінде дауыс қоңыраулары қалай жүзеге асырылады?",opts:["Тек классикалық circuit-switched арқылы","VoLTE — IP негізінде","Тек Wi-Fi арқылы","SMS арқылы кодталған сигнал ретінде"],ans:1},
+  {s:"II. 4G/LTE",q:"LTE желісіндегі handover процесі деген не?",opts:["Құрылғыны қайта жүктеу","Пайдаланушының бір базалық станциядан екіншісіне үздіксіз ауысуы","SIM картаны ауыстыру","Жиілік диапазонын өзгерту"],ans:1},
+  {s:"II. 4G/LTE",q:"4G LTE-де қолданылатын негізгі жиілік диапазондары қай аралықта?",opts:["400-900 МГц ғана","700 МГц — 2600 МГц","5 ГГц — 10 ГГц","24 ГГц — 100 ГГц"],ans:1},
+  {s:"III. IoT",q:"IoT (Internet of Things) түсінігі нені білдіреді?",opts:["Тек компьютерлерді интернетке қосу","Физикалық заттар мен құрылғыларды интернет арқылы өзара байланыстыру","Тек смартфондар арасындағы байланыс","Жасанды интеллект технологиясы"],ans:1},
+  {s:"III. IoT",q:"LPWAN технологиясының негізгі ерекшелігі қандай?",opts:["Жоғары жылдамдық, қысқа қашықтық","Төмен қуат тұтыну, үлкен қамту аймағы, төмен деректер жылдамдығы","Тек қала ішінде жұмыс істейді","Тек бейне жіберуге арналған"],ans:1},
+  {s:"III. IoT",q:"Қандай IoT хаттамасы publish-subscribe моделін қолданады?",opts:["HTTP","MQTT","FTP","SMTP"],ans:1},
+  {s:"III. IoT",q:"NB-IoT технологиясы қандай желі инфрақұрылымын пайдаланады?",opts:["Wi-Fi нүктелері","Бар LTE/4G базалық станциялары","Спутниктік антенналар","Bluetooth маяктары"],ans:1},
+  {s:"III. IoT",q:"IoT құрылғыларының қауіпсіздігіне қатысты ең көп мәселе қандай?",opts:["Батареяның тез бітуі","Әлсіз аутентификация және шифрлаудың болмауы","Экранның кішілігі","Түстердің дұрыс көрінбеуі"],ans:1},
+  {s:"III. IoT",q:"Edge Computing IoT жүйелеріне қандай артықшылық береді?",opts:["Барлық деректерді бұлтқа жібереді","Деректерді құрылғыға жақын жерде өңдеп, кешігуді азайтады","Тек деректерді сақтауға арналған","Құрылғылардың батареясын зарядтайды"],ans:1},
+  {s:"III. IoT",q:"LoRaWAN желісіндегі типтік деректер жіберу жылдамдығы қандай?",opts:["1-10 Гбит/с","100-500 Мбит/с","0,3-50 кбит/с","10-100 Мбит/с"],ans:2},
+  {s:"IV. Болашақ технологиялар",q:"Кванттық кілт таратуда (QKD) қауіпсіздік неге негізделген?",opts:["Математикалық есептеу күрделілігіне","Кванттық механиканың физикалық заңдарына","Деректерді қысу алгоритмдеріне","Пароль ұзындығына"],ans:1},
+  {s:"IV. Болашақ технологиялар",q:"Micius спутнигі 2017 жылы қандай жетістікке қол жеткізді?",opts:["Марсқа сигнал жіберді","1200 км қашықтықта кванттық шатасуды таратты","Алғашқы 6G байланысты орнатты","Жерді Wi-Fi-мен қамтыды"],ans:1},
+  {s:"IV. Болашақ технологиялар",q:"Гибридті спутниктік-жерүсті желілердің негізгі мақсаты қандай?",opts:["Жерүсті желілерді толық ауыстыру","Спутниктік және жерүсті желілерді біріктіріп, қамтуды кеңейту","Тек әскери мақсаттарда пайдалану","Тек бейне ағынын жақсарту"],ans:1},
+  {s:"IV. Болашақ технологиялар",q:"LEO спутниктерінің GEO-мен салыстырғандағы басты артықшылығы?",opts:["Орбитада ұзақ тұрақтылығы","Бір спутникпен бүкіл Жерді қамту","Төмен кешігу (latency) және жоғары жылдамдық","Құны бірнеше есе арзан"],ans:2},
+  {s:"IV. Болашақ технологиялар",q:"«Harvest now, decrypt later» стратегиясы нені білдіреді?",opts:["Деректерді жинап, бірден пайдалану","Бүгін шифрланған деректерді жинап, болашақта кванттық компьютермен шешу","Деректерді қысып, кейін ашу","Ескі деректерді жою"],ans:1},
+  {s:"IV. Болашақ технологиялар",q:"5G Network Slicing технологиясы нені мүмкін етеді?",opts:["Бір физикалық желіде виртуалды желілер құру","Желіні физикалық түрде бөліктерге бөлу","Тек IoT құрылғыларын қосу","Деректерді шифрлау"],ans:0},
+  {s:"IV. Болашақ технологиялар",q:"Қытайдың CN-QCN кванттық желісінің жалпы ұзындығы қанша?",opts:["100 км-ден астам","1 000 км-ден астам","10 000 км-ден астам","100 000 км-ден астам"],ans:2},
+  {s:"V. Ситуациялық",q:"Шалғай тау аймағындағы метеостанциядан күнделікті бір рет шағын деректер жіберу. Ең қолайлы технология?",opts:["5G mmWave","LoRaWAN / LPWAN","Талшықты-оптикалық кабель","Wi-Fi 6"],ans:1},
+  {s:"V. Ситуациялық",q:"Қаржы банкі филиалдар арасын абсолютті қорғалған, кванттық шабуылдарға төзімді байланыспен жалғағысы келеді. Шешім?",opts:["AES-256 шифрлау","VPN арқылы байланыс","QKD қолданатын талшықты желі","Bluetooth шифрлау"],ans:2},
+  {s:"V. Ситуациялық",q:"Мұхит ортасындағы жүк кемесіне тұрақты интернет қажет. Жерүсті желі жоқ. Шешім?",opts:["4G LTE базалық станциясы","Bluetooth Mesh","LEO спутниктік байланыс (Starlink Maritime)","NB-IoT"],ans:2},
+  {s:"V. Ситуациялық",q:"50 000 су есептегіш: айына бір рет шағын деректер, 10 жыл батарея. Қандай желі?",opts:["5G eMBB","NB-IoT немесе LoRaWAN","Wi-Fi Direct","4G LTE-A Carrier Aggregation"],ans:1},
+  {s:"V. Ситуациялық",q:"Еуропа-Азия арасында кванттық қорғалған бейнеконференция. Жерүсті QKD жеткіліксіз. Тәсіл?",opts:["VPN арқылы бейнеконференция","Кванттық спутникті (QKD satellite) пайдалану","USB-де физикалық тасымалдау","FM радио арнасын шифрлау"],ans:1},
+];
+
+let qzCurrent = 0, qzCorrectCount = 0, qzWrongCount = 0, qzAnswered = new Array(QUIZ_DATA.length).fill(null);
+
+function qzRender() {
+  const c = document.getElementById('quizContainer');
+  const d = QUIZ_DATA[qzCurrent];
+  const letters = ['A','B','C','D'];
+  const answered = qzAnswered[qzCurrent];
+
+  let html = `
+    <div class="quiz-progress-bar"><div class="quiz-progress-fill" style="width:${((qzCurrent+1)/QUIZ_DATA.length)*100}%"></div></div>
+    <div class="quiz-card">
+      <div class="quiz-section-label">${d.s}</div>
+      <div class="quiz-q-num">${qzCurrent+1}-сұрақ / ${QUIZ_DATA.length}</div>
+      <div class="quiz-q-text">${d.q}</div>
+      <div class="quiz-options">`;
+
+  d.opts.forEach((opt, i) => {
+    let cls = '';
+    if (answered !== null) {
+      if (i === d.ans) cls = 'q-correct';
+      else if (i === answered && answered !== d.ans) cls = 'q-wrong';
+      cls += ' q-disabled';
+    }
+    html += `<div class="quiz-opt ${cls}" onclick="qzAnswer(${i})">
+      <span class="opt-letter">${letters[i]}</span>
+      <span>${opt}</span>
+    </div>`;
+  });
+
+  html += `</div></div>
+    <div class="quiz-nav">
+      <button class="btn-action" onclick="qzPrev()" ${qzCurrent===0?'disabled style="opacity:0.3"':''}>← Алдыңғы</button>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-dim)">${qzCurrent+1} / ${QUIZ_DATA.length}</span>
+      <button class="btn-action" onclick="qzNext()">${qzCurrent===QUIZ_DATA.length-1?'Нәтиже →':'Келесі →'}</button>
+    </div>`;
+
+  c.innerHTML = html;
+  document.getElementById('qzProgress').textContent = `${qzCurrent+1}/${QUIZ_DATA.length}`;
+}
+
+function qzAnswer(i) {
+  if (qzAnswered[qzCurrent] !== null) return;
+  qzAnswered[qzCurrent] = i;
+  if (i === QUIZ_DATA[qzCurrent].ans) qzCorrectCount++;
+  else qzWrongCount++;
+  document.getElementById('qzCorrect').textContent = qzCorrectCount;
+  document.getElementById('qzWrong').textContent = qzWrongCount;
+  qzRender();
+}
+
+function qzPrev() { if(qzCurrent>0){qzCurrent--;qzRender();} }
+
+function qzNext() {
+  if (qzCurrent < QUIZ_DATA.length - 1) { qzCurrent++; qzRender(); }
+  else {
+    const pct = Math.round((qzCorrectCount / QUIZ_DATA.length) * 100);
+    const pts = qzCorrectCount * 10; // 10 points per correct answer only
+    scores.quiz = pts; updateTotalScore();
+    document.getElementById('qz-best').textContent = 'Ең жақсы: ' + pts;
+    const emoji = pct >= 80 ? '🏆' : pct >= 50 ? '👍' : '📚';
+    showOverlay(emoji, pct + '%', `${qzCorrectCount}/${QUIZ_DATA.length} дұрыс — ${pts} ұпай`, 'Тамаша', null, 'Қайта', qzReset);
+  }
+}
+
+function qzReset() {
+  qzCurrent = 0; qzCorrectCount = 0; qzWrongCount = 0;
+  qzAnswered = new Array(QUIZ_DATA.length).fill(null);
+  document.getElementById('qzCorrect').textContent = '0';
+  document.getElementById('qzWrong').textContent = '0';
+  qzRender();
+}
+
+// ============================================================
+// CONNECTIONS
+// ============================================================
+const CONN_CATEGORIES = [
+  { name: "4G LTE АРХИТЕКТУРАСЫ", items: ["UE", "ENODEB", "MME", "PGW"], color: 0 },
+  { name: "IOT ХАТТАМАЛАРЫ", items: ["NB-IOT", "LORAWAN", "SIGFOX", "ZIGBEE"], color: 1 },
+  { name: "PATHLOSS МОДЕЛЬДЕРІ", items: ["OKUMURA-HATA", "LNS", "FREESPACE", "COST231-HATA"], color: 2 },
+  { name: "5G TECHNOLOGIES", items: ["MMWAVE", "URLLC", "EMBB", "MMTC"], color: 3 },
+];
+
+let connTiles = [], connSelected = [], connMistakes = 0, connSolvedCats = [], connPlayed = false;
+
+function connInit() {
+  connTiles = [];
+  CONN_CATEGORIES.forEach((cat, ci) => {
+    cat.items.forEach(item => connTiles.push({ text: item, cat: ci }));
+  });
+  connShuffle();
+}
+
+function connShuffle() {
+  if(connPlayed) return;
+  const unsolved = connTiles.filter(t => !connSolvedCats.includes(t.cat));
+  for (let i = unsolved.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    const ti = connTiles.indexOf(unsolved[i]);
+    const tj = connTiles.indexOf(unsolved[j]);
+    [connTiles[ti], connTiles[tj]] = [connTiles[tj], connTiles[ti]];
+  }
+  connSelected = [];
+  connRenderBoard();
+}
+
+function connDeselect() {
+  if(connPlayed) return;
+  connSelected = [];
+  connRenderBoard();
+}
+
+function connGetPoints() {
+  // 50 for 1, 100 for 2, 200 for 3, 350 for 4
+  const table = [0, 50, 100, 200, 350];
+  return table[connSolvedCats.length] || 0;
+}
+
+function connRenderBoard() {
+  // Solved labels
+  const sl = document.getElementById('connSolved');
+  sl.innerHTML = '';
+  connSolvedCats.forEach(ci => {
+    const cat = CONN_CATEGORIES[ci];
+    const d = document.createElement('div');
+    d.className = `conn-solved-label conn-cat-${cat.color}`;
+    d.innerHTML = `<div class="cat-name">${cat.name}</div><div class="cat-items">${cat.items.join(', ')}</div>`;
+    sl.appendChild(d);
+  });
+
+  // Board
+  const b = document.getElementById('connBoard');
+  b.innerHTML = '';
+  const unsolved = connTiles.filter(t => !connSolvedCats.includes(t.cat));
+  unsolved.forEach((tile, i) => {
+    const d = document.createElement('div');
+    d.className = 'conn-tile';
+    if (connSelected.includes(tile)) d.classList.add('conn-selected');
+    if (connPlayed) d.classList.add('conn-solved');
+    d.textContent = tile.text;
+    d.onclick = () => connToggle(tile);
+    b.appendChild(d);
+  });
+
+  document.getElementById('connSubmitBtn').disabled = connSelected.length !== 4 || connPlayed;
+
+  // Mistakes
+  for (let i = 0; i < 4; i++) {
+    document.getElementById('md' + i).className = 'mistake-dot' + (i < connMistakes ? ' used' : '');
+  }
+
+  // Show locked message if played
+  const lockMsg = document.getElementById('connLockMsg');
+  if(lockMsg) lockMsg.style.display = connPlayed ? 'block' : 'none';
+}
+
+function connToggle(tile) {
+  if (connPlayed) return;
+  if (connSolvedCats.includes(tile.cat)) return;
+  if (connMistakes >= 4) return;
+  const idx = connSelected.indexOf(tile);
+  if (idx >= 0) connSelected.splice(idx, 1);
+  else if (connSelected.length < 4) connSelected.push(tile);
+  connRenderBoard();
+}
+
+function connSubmit() {
+  if (connSelected.length !== 4 || connPlayed) return;
+  const cats = connSelected.map(t => t.cat);
+  const allSame = cats.every(c => c === cats[0]);
+
+  if (allSame) {
+    connSolvedCats.push(cats[0]);
+    connSelected = [];
+    
+    // Update score progressively
+    const pts = connGetPoints();
+    scores.connections = pts; updateTotalScore();
+    
+    connRenderBoard();
+
+    if (connSolvedCats.length === 4) {
+      connPlayed = true;
+      document.getElementById('cn-best').textContent = 'Ең жақсы: ' + pts;
+      setTimeout(() => showOverlay('🧩', 'Тамаша!', `${connMistakes} қате — ${pts} ұпай`, 'Жарайды', null), 500);
+      connRenderBoard();
+    }
+  } else {
+    connMistakes++;
+    const board = document.getElementById('connBoard');
+    board.classList.add('conn-shake');
+    setTimeout(() => board.classList.remove('conn-shake'), 500);
+
+    if (connMistakes >= 4) {
+      connPlayed = true;
+      // Reveal all remaining
+      setTimeout(() => {
+        CONN_CATEGORIES.forEach((_, ci) => { if (!connSolvedCats.includes(ci)) connSolvedCats.push(ci); });
+        connSelected = [];
+        const pts = connGetPoints();
+        scores.connections = pts; updateTotalScore();
+        document.getElementById('cn-best').textContent = 'Ең жақсы: ' + pts;
+        connRenderBoard();
+        setTimeout(() => showOverlay('😅', 'Аяқталды', `${connSolvedCats.filter((_,i)=>i<connSolvedCats.length).length > 0 ? connGetPoints() : 0} ұпай`, 'OK', null), 300);
+      }, 600);
+    }
+
+    connRenderBoard();
+  }
+}
+
+function connReset() {
+  // Don't allow reset if already played
+  if(connPlayed) return;
+  connMistakes = 0;
+  connSolvedCats = [];
+  connSelected = [];
+  connInit();
+  connRenderBoard();
+}
+
+// ============================================================
+// INIT
+// ============================================================
+wsBuild(); wsRender(); wsRenderList();
+qzRender();
+connInit(); connRenderBoard();
+</script>
+</body>
+</html>
